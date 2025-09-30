@@ -1,0 +1,1 @@
+SAMPLE_CONSTANT: int = 10
