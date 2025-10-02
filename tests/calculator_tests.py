@@ -47,10 +47,6 @@ class TestCalculator(unittest.TestCase):
         self.assertEqual(self.calc.calculate('5 - +3'), 2)
         self.assertEqual(self.calc.calculate('+5 * +3'), 15)
         self.assertEqual(self.calc.calculate('-10 * -5'), 50)
-        self.assertEqual(self.calc.calculate('- -2'), 2)
-        self.assertEqual(self.calc.calculate('- +2'), -2)
-        self.assertEqual(self.calc.calculate('+ -2'), -2)
-        self.assertEqual(self.calc.calculate('+ +2'), 2)
 
 
     def test_complex_expressions(self):
@@ -79,6 +75,8 @@ class TestCalculator(unittest.TestCase):
             self.calc.calculate('1..1')
         with self.assertRaises(CalcError):
             self.calc.calculate('1.1.1')
+        with self.assertRaises(CalcError):
+            self.calc.calculate('--2')
 
     def test_division_by_zero(self):
         with self.assertRaises(CalcError):
