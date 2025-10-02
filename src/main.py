@@ -16,7 +16,7 @@ class Calculator:
         if re.search(r'\d\s+\d', expr):
             raise CalcError('Пропущен оператор между числами')
 
-        expr_without_spaces = re.sub(r'\s+', '', expr)
+        expr_without_spaces = expr.replace(' ','')
 
         pattern = r'\d+\.?\d*|\.\d+|\*\*|//|[()*/%+-]'
 
@@ -196,3 +196,10 @@ if __name__ == '__main__':
         print(f'Ошибка: {error}')
 
 
+import os
+
+# Текущая рабочая папка
+print("Текущая папка:", os.getcwd())
+
+# Абсолютный путь к текущему файлу
+print(__file__)
