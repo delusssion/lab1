@@ -10,37 +10,34 @@ class Calculator:
 
     def tokenize(self, expr: str) -> list[str]:
         """Токенизация математического выражения"""
+        
         if not expr.strip():
             raise CalcError('Пустое выражение')
+
+        expr_clean = expr.replace(' ', '')
+
+        if re.match(r'^[+\-]{2,}', expr_clean):
+            raise CalcError('Несколько унарных операторов подряд')
+            
+        if expr_clean[0] in ['*', '/', '%']:
+            if not (len(expr_clean) > 1 and expr_clean[1] in ['*', '/']):
+                raise CalcError('Выражение не может начинаться с оператора')
 
         if re.search(r'\d\s+\d', expr):
             raise CalcError('Пропущен оператор между числами')
 
-        expr_without_spaces = expr.replace(' ','')
-
         pattern = r'\d+\.?\d*|\.\d+|\*\*|//|[()*/%+-]'
 
-        tokens = []
+        tokens: list[str] = []
         i = 0
-        while i < len(expr_without_spaces):
-
-            match = re.match(pattern, expr_without_spaces[i:])
+        while i < len(expr_clean):
+            match = re.match(pattern, expr_clean[i:])
             if match:
                 token = match.group()
-
-                if token in ['+', '-'] and (not tokens or tokens[-1] in ['(', '+', '-', '*', '/', '//', '%', '**']):
-                    i += len(token)
-                    if i < len(expr_without_spaces):
-                        num_match = re.match(r'\d+\.?\d*', expr_without_spaces[i:])
-                        if num_match:
-                            token += num_match.group()
-                            i += len(num_match.group())
-                else:
-                    i += len(token)
-
                 tokens.append(token)
+                i += len(token)
             else:
-                raise CalcError(f'Некорректный символ: {expr_without_spaces[i]}')
+                raise CalcError(f'Некорректный символ: {expr_clean[i]}')
 
         for token in tokens:
             token_without_unary = token.lstrip('-+')
@@ -58,8 +55,7 @@ class Calculator:
             curr_token = tokens[i]
             next_token = tokens[i + 1]
 
-            if (curr_token in ['+', '**', '//', '%', '/', '*', '-'] and next_token in ['+', '**', '//', '%', '/', '*', '-'] and\
-                not (curr_token + next_token in ['**', '//'])): # noqa: E713
+            if (curr_token in ['+', '**', '//', '%', '/', '*', '-'] and next_token in ['+', '**', '//', '%', '/', '*', '-'] and not (curr_token + next_token in ['**', '//'])):
                 raise CalcError('Недопустимая последовательность операторов')
 
             if curr_token == '(' and next_token in '*/%+':
@@ -74,7 +70,7 @@ class Calculator:
             if (curr_token == ')' and self.is_number(next_token)):
                 raise CalcError('Пропущен оператор между закрывающей скобкой и числом')
 
-        if tokens == ['(', ')']:
+        if tokens['(', ')']:
             raise CalcError('Пустые скобки')
 
         if tokens and tokens[-1] in ['+', '-', '*', '/', '//', '%', '**']:
@@ -86,23 +82,23 @@ class Calculator:
                 bracket_balance += 1
             elif token == ')':
                 bracket_balance -= 1
+                if bracket_balance < 0:
+                    raise CalcError('Некорректный порядок скобок')
+
         if bracket_balance != 0:
             raise CalcError('Некорректное использование скобок')
 
         return tokens
 
     def expr(self, tokens: list[str]) -> float:
-        """Парсит выражение"""
         return self.add(tokens)
 
     def add(self, tokens: list[str]) -> float:
-        """Парсит сложение и вычитание"""
         result = self.mul(tokens)
 
         while tokens and tokens[0] in ['+', '-']:
             op = tokens.pop(0)
             right = self.mul(tokens)
-
             if op == '+':
                 result += right
             else:
@@ -110,15 +106,12 @@ class Calculator:
 
         return result
 
-
     def mul(self, tokens: list[str]) -> float:
-        """Парсит умножение, деление, mod и div"""
         result = self.pow(tokens)
 
         while tokens and tokens[0] in ['*', '/', '//', '%']:
             op = tokens.pop(0)
             right = self.pow(tokens)
-
             if op == '*':
                 result *= right
             elif op == '/':
@@ -141,18 +134,14 @@ class Calculator:
         return result
 
     def pow(self, tokens: list[str]) -> float:
-        """Парсит возведение в степень"""
         result = self.unary(tokens)
-
         if tokens and tokens[0] == '**':
             tokens.pop(0)
             right = self.pow(tokens)
             result **= right
-
         return result
 
     def unary(self, tokens: list[str]) -> float:
-        """Парсит унарные операции"""
         if tokens and tokens[0] in ['+', '-']:
             op = tokens.pop(0)
             result = self.unary(tokens)
@@ -161,7 +150,6 @@ class Calculator:
             return self.primary(tokens)
 
     def primary(self, tokens: list[str]) -> float:
-        """Парсит числа и скобки"""
         if tokens[0] == '(':
             tokens.pop(0)
             result = self.expr(tokens)
@@ -169,32 +157,29 @@ class Calculator:
             return result
         else:
             token = tokens.pop(0)
+            if not self.is_number(token):
+                raise CalcError(f'Некорректный токен: {token}')
             if '.' in token:
                 return float(token)
             else:
                 return int(token)
 
     def is_number(self, token: str) -> bool:
-        """Проверка, является ли токен числом"""
         token_without_unary = token.lstrip('-+')
         return token_without_unary.replace('.', '').isdigit() and token_without_unary.count('.') <= 1
 
     def is_integer(self, number: float) -> bool:
-        """Проверка, является ли число целым"""
         return isinstance(number, int) or (isinstance(number, float) and number.is_integer())
 
     def calculate(self, expression: str) -> float:
-        """Вычисление математического выражения"""
         tokens = self.tokenize(expression)
         result = self.expr(tokens)
-
         return result
 
 
 if __name__ == '__main__':
     calculator = Calculator()
     print('Введите выражение:')
-
     try:
         result = calculator.calculate(input())
         print(f'Результат: {result}')
