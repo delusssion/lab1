@@ -74,6 +74,12 @@ class Calculator:
             if (curr_token == ')' and self.is_number(next_token)):
                 raise CalcError('Пропущен оператор между закрывающей скобкой и числом')
 
+        if tokens == ['(', ')']:
+            raise CalcError('Пустые скобки')
+
+        if tokens and tokens[-1] in ['+', '-', '*', '/', '//', '%', '**']:
+            raise CalcError('Выражение не может заканчиваться оператором')
+
         bracket_balance = 0
         for token in tokens:
             if token == '(':
@@ -194,12 +200,3 @@ if __name__ == '__main__':
         print(f'Результат: {result}')
     except CalcError as error:
         print(f'Ошибка: {error}')
-
-
-import os
-
-# Текущая рабочая папка
-print("Текущая папка:", os.getcwd())
-
-# Абсолютный путь к текущему файлу
-print(__file__)
