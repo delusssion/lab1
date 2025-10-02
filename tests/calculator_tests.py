@@ -21,7 +21,7 @@ class TestCalculator(unittest.TestCase):
         self.assertEqual(self.calc.calculate('0.11 - 0.09'), 0.02)
         self.assertEqual(self.calc.calculate('10.0 * 3.1'), 31)
         self.assertEqual(self.calc.calculate('10.0 / 4.0'), 2.5)
-    
+
     def test_operations_priority(self):
         self.assertEqual(self.calc.calculate('2 + 3 * 4'), 14)
         self.assertEqual(self.calc.calculate('(2 + 3) * 4'), 20)
@@ -84,7 +84,7 @@ class TestCalculator(unittest.TestCase):
             self.calc.calculate('10 // 0')
         with self.assertRaises(CalcError):
             self.calc.calculate('10 % 0')
-    
+
     def test_integer_operations_with_float_nums(self):
         with self.assertRaises(CalcError):
             self.calc.calculate('10.1 // 2')
@@ -94,7 +94,7 @@ class TestCalculator(unittest.TestCase):
             self.calc.calculate('11.4 % 4')
         with self.assertRaises(CalcError):
             self.calc.calculate('10 % 2.5')
-    
+
     def test_incorrect_syntex(self):
         with self.assertRaises(CalcError):
             self.calc.calculate('10 +')
@@ -106,7 +106,7 @@ class TestCalculator(unittest.TestCase):
             self.calc.calculate('2 * e')
         with self.assertRaises(CalcError):
             self.calc.calculate('10 $ 3')
-    
+
     def test_incorrect_brackets(self):
         with self.assertRaises(CalcError):
             self.calc.calculate('(2 - 1')
@@ -119,4 +119,4 @@ class TestCalculator(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-    
+
