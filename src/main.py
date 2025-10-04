@@ -16,10 +16,9 @@ class Calculator:
         if re.search(r'\d\s+\d', expr):
             raise CalcError('Пропущен оператор между числами')
 
-        expr_without_spaces = expr.replace(' ','')
+        expr_without_spaces = expr.replace(' ', '')
 
-        first_char = expr.replace(' ', '')[0] if expr.replace(' ', '') else ''
-        if first_char in ['*', '/', '%']:
+        if expr_without_spaces[0] in ['*', '/', '%']:
             raise CalcError('Выражение не может начинаться с оператора')
 
         pattern = r'\d+\.?\d*|\.\d+|\*\*|//|[()*/%+-]'
@@ -63,7 +62,7 @@ class Calculator:
             next_token = tokens[i + 1]
 
             if (curr_token in ['+', '**', '//', '%', '/', '*', '-'] and next_token in ['+', '**', '//', '%', '/', '*', '-'] and\
-                not (curr_token + next_token in ['**', '//'])):
+                ((curr_token + next_token) not in ['**', '//'])):
                 raise CalcError('Недопустимая последовательность операторов')
 
             if curr_token == '(' and next_token in '*/%+':
@@ -81,7 +80,7 @@ class Calculator:
         if tokens == ['(', ')']:
             raise CalcError('Пустые скобки')
 
-        if tokens and tokens[-1] in ['+', '-', '*', '/', '//', '%', '**']:
+        if tokens[-1] in ['+', '-', '*', '/', '//', '%', '**']:
             raise CalcError('Выражение не может заканчиваться оператором')
 
         if expr_without_spaces.startswith(('++', '--', '+-', '-+')):
@@ -98,7 +97,6 @@ class Calculator:
 
         if bracket_balance != 0:
             raise CalcError('Некорректное использование скобок')
-
 
         return tokens
 
