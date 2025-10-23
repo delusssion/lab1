@@ -172,7 +172,7 @@ class Calculator:
     def primary(self, tokens: list[str]) -> float:
         token = tokens.pop(0)
         if token == '(':
-            if not tokens or tokens[0] == ')':
+            if tokens[0] == ')':
                 raise CalcError('Пустые скобки')   
             result = self.expr(tokens)
             if not tokens or tokens[0] != ')':
