@@ -65,7 +65,7 @@ class Calculator:
                 ((curr_token + next_token) not in ['**', '//'])):
                 raise CalcError('Недопустимая последовательность операторов')
 
-            if curr_token == '(' and next_token in '*/%+':
+            if curr_token == '(' and next_token in '*/%+-':
                 raise CalcError('После открывающей скобки не может быть оператора')
 
             if curr_token in '+-*/%' and next_token == ')':
@@ -170,18 +170,18 @@ class Calculator:
             return self.primary(tokens)
 
     def primary(self, tokens: list[str]) -> float:
-        """Парсит числа и скобки"""
-        if tokens[0] == '(':
-            tokens.pop(0)
+        token = tokens.pop(0)
+        if token == '(':
+            if not tokens or tokens[0] == ')':
+                raise CalcError("Пустые скобки")   
             result = self.expr(tokens)
+            if not tokens or tokens[0] != ')':
+                raise CalcError("Ожидалась закрывающая скобка")
             tokens.pop(0)
             return result
         else:
-            token = tokens.pop(0)
-            if '.' in token:
-                return float(token)
-            else:
-                return int(token)
+            return float(token)
+        
 
     def is_number(self, token: str) -> bool:
         """Проверка, является ли токен числом"""
