@@ -173,10 +173,10 @@ class Calculator:
         token = tokens.pop(0)
         if token == '(':
             if not tokens or tokens[0] == ')':
-                raise CalcError("Пустые скобки")   
+                raise CalcError('Пустые скобки')   
             result = self.expr(tokens)
             if not tokens or tokens[0] != ')':
-                raise CalcError("Ожидалась закрывающая скобка")
+                raise CalcError('Ожидалась закрывающая скобка')
             tokens.pop(0)
             return result
         else:
