@@ -1,8 +1,19 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "labs"
 version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.12"
-dependencies = [
-    "pytest>=8.4.2",
-]
+dependencies = ["pytest>=8.4.2"]
+
+[tool.ruff]
+line-length = 88
+exclude = ["build", "dist", ".venv"]
+per-file-ignores = { "tests/*.py" = ["F401"] }
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true

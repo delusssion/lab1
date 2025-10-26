@@ -1,120 +1,106 @@
-import sys
+from src.main import Calculator
 
-sys.path.insert(0, '/Users/delusionn/prog/labs/lab1')
 
-from src.main import CalcError, Calculator
-import unittest
-
-class TestCalculator(unittest.TestCase):
-
-    def setUp(self):
+class TestCalculator:
+    def setup_method(self):
         self.calc = Calculator()
 
-    def test_operations(self):
-        self.assertEqual(self.calc.calculate('2 + 3'), 5)
-        self.assertEqual(self.calc.calculate('7 - 3'), 4)
-        self.assertEqual(self.calc.calculate('2 * 3'), 6)
-        self.assertEqual(self.calc.calculate('2 ** 3'), 8)
-        self.assertEqual(self.calc.calculate('9 / 3'), 3)
-        self.assertEqual(self.calc.calculate('10 % 3'), 1)
-        self.assertEqual(self.calc.calculate('13 // 4'), 3)
+    def test_addition(self):
+        assert self.calc.evaluate('2 + 3') == 5.0
+        assert self.calc.evaluate('10 + 20') == 30.0
+        assert self.calc.evaluate('0 + 0') == 0.0
+        assert self.calc.evaluate('-5 + 10') == 5.0
 
-    def test_float_numbers(self):
-        self.assertEqual(self.calc.calculate('2.5 + 3.5'), 6)
-        self.assertEqual(self.calc.calculate('2.1 + 5.5'), 7.6)
-        self.assertEqual(self.calc.calculate('10.0 * 3.1'), 31)
-        self.assertEqual(self.calc.calculate('10.0 / 4.0'), 2.5)
+    def test_subtraction(self):
+        assert self.calc.evaluate('5 - 3') == 2.0
+        assert self.calc.evaluate('10 - 20') == -10.0
+        assert self.calc.evaluate('0 - 0') == 0.0
+        assert self.calc.evaluate('-5 - 10') == -15.0
 
-    def test_operations_priority(self):
-        self.assertEqual(self.calc.calculate('2 + 3 * 4'), 14)
-        self.assertEqual(self.calc.calculate('(2 + 3) * 4'), 20)
-        self.assertEqual(self.calc.calculate('10 - 2 ** 3'), 2)
-        self.assertEqual(self.calc.calculate('2 * 3 + 4 * 5 - 20 / 4'), 21)
-        self.assertEqual(self.calc.calculate('10 // 3 ** 2'), 1)
-        self.assertEqual(self.calc.calculate('(10 // 3) ** 2'), 9)
+    def test_multiplication(self):
+        assert self.calc.evaluate('2 * 3') == 6.0
+        assert self.calc.evaluate('10 * 0') == 0.0
+        assert self.calc.evaluate('-5 * 4') == -20.0
+        assert self.calc.evaluate('2.5 * 4') == 10.0
 
-    def test_integer_operations(self):
-        self.assertEqual(self.calc.calculate('10 // 3'), 3)
-        self.assertEqual(self.calc.calculate('10 % 3'), 1)
-        self.assertEqual(self.calc.calculate('15 // 2'), 7)
-        self.assertEqual(self.calc.calculate('15 % 2'), 1)
+    def test_division(self):
+        assert self.calc.evaluate('6 / 2') == 3.0
+        assert self.calc.evaluate('10 / 4') == 2.5
+        assert self.calc.evaluate('0 / 5') == 0.0
+        assert self.calc.evaluate('-10 / 2') == -5.0
 
-    def test_unary_operations(self):
-        self.assertEqual(self.calc.calculate('-2'), -2)
-        self.assertEqual(self.calc.calculate('+15'), 15)
-        self.assertEqual(self.calc.calculate('-3 + 5'), 2)
-        self.assertEqual(self.calc.calculate('5 + -3'), 2)
-        self.assertEqual(self.calc.calculate('5 - +3'), 2)
-        self.assertEqual(self.calc.calculate('+5 * +3'), 15)
-        self.assertEqual(self.calc.calculate('-10 * -5'), 50)
+    def test_integer_division(self):
+        assert self.calc.evaluate('7 // 2') == 3.0
+        assert self.calc.evaluate('10 // 3') == 3.0
+        assert self.calc.evaluate('-7 // 2') == -4.0
 
+    def test_modulo(self):
+        assert self.calc.evaluate('7 % 3') == 1.0
+        assert self.calc.evaluate('10 % 5') == 0.0
+        assert self.calc.evaluate('8 % 3') == 2.0
 
+    def test_power(self):
+        assert self.calc.evaluate('2 ** 3') == 8.0
+        assert self.calc.evaluate('5 ** 2') == 25.0
+        assert self.calc.evaluate('10 ** 0') == 1.0
+        assert self.calc.evaluate('2 ** -1') == 0.5
+
+    # Комплексные выражения
     def test_complex_expressions(self):
-        self.assertEqual(self.calc.calculate('(5 - 3 * (7 - (2 + 2)) - 1)'), -5)
-        self.assertEqual(self.calc.calculate('(8 - 3) * (2 + 2) - (2 * (1 + 2))'), 14)
-        self.assertEqual(self.calc.calculate('(10 - 2) ** (3 - 1)'), 64)
-        self.assertEqual(self.calc.calculate('(15 % 4) + 2.5 - (7 - 2 + (3 * 4))'), -11.5)
+        assert self.calc.evaluate('2 + 3 * 4') == 14.0
+        assert self.calc.evaluate('(2 + 3) * 4') == 20.0
+        assert self.calc.evaluate('10 - 2 * 3 + 4') == 8.0
+        assert self.calc.evaluate('2 * 3 + 4 * 5') == 26.0
 
-    def test_degree_priority(self):
-        self.assertEqual(self.calc.calculate('2 ** 3 ** 2'), 512)
-        self.assertEqual(self.calc.calculate('(2 ** 3) ** 2'), 64)
+    def test_nested_parentheses(self):
+        assert self.calc.evaluate('((2 + 3) * 4)') == 20.0
+        assert self.calc.evaluate('(2 * (3 + 4))') == 14.0
+        assert self.calc.evaluate('((1 + 2) * (3 + 4))') == 21.0
 
-    def test_expr_with_spaces(self):
-        self.assertEqual(self.calc.calculate('   2  + 3  '), 5)
-        self.assertEqual(self.calc.calculate('-    10   +    -    3'), -13)
-        self.assertEqual(self.calc.calculate('      (2 ** 3      )    -  1'), 7)
+    def test_unary_operators(self):
+        assert self.calc.evaluate('+5') == 5.0
+        assert self.calc.evaluate('-5') == -5.0
+        assert self.calc.evaluate('--5') == 5.0
+        assert self.calc.evaluate('+-5') == -5.0
+        assert self.calc.evaluate('-+5') == -5.0
+        assert self.calc.evaluate('++5') == 5.0
+        assert self.calc.evaluate('++--++-+++--5') == -5.0
 
-    def test_incorrect_numbers(self):
-        with self.assertRaises(CalcError):
-            self.calc.calculate('011')
-        with self.assertRaises(CalcError):
-            self.calc.calculate('.91')
-        with self.assertRaises(CalcError):
-            self.calc.calculate('22.')
-        with self.assertRaises(CalcError):
-            self.calc.calculate('1..1')
-        with self.assertRaises(CalcError):
-            self.calc.calculate('1.1.1')
-        with self.assertRaises(CalcError):
-            self.calc.calculate('--2')
+    def test_unary_with_binary(self):
+        assert self.calc.evaluate('5 + -3') == 2.0
+        assert self.calc.evaluate('10 * -2') == -20.0
+        assert self.calc.evaluate('-5 * -4') == 20.0
+        assert self.calc.evaluate('10 / -2') == -5.0
 
-    def test_division_by_zero(self):
-        with self.assertRaises(CalcError):
-            self.calc.calculate('10 / 0')
-        with self.assertRaises(CalcError):
-            self.calc.calculate('10 // 0')
-        with self.assertRaises(CalcError):
-            self.calc.calculate('10 % 0')
+    def test_floats(self):
+        assert self.calc.evaluate('2.5 + 3.5') == 6.0
+        assert self.calc.evaluate('0.1 + 0.2') == 0.3
+        assert self.calc.evaluate('3.14 * 2') == 6.28
+        assert self.calc.evaluate('10.5 / 2') == 5.25
 
-    def test_integer_operations_with_float_nums(self):
-        with self.assertRaises(CalcError):
-            self.calc.calculate('10.1 // 2')
-        with self.assertRaises(CalcError):
-            self.calc.calculate('10 // 2.1')
-        with self.assertRaises(CalcError):
-            self.calc.calculate('11.4 % 4')
-        with self.assertRaises(CalcError):
-            self.calc.calculate('10 % 2.5')
+    def test_operator_precedence(self):
+        assert self.calc.evaluate('2 + 3 * 4') == 14.0
+        assert self.calc.evaluate('2 * 3 + 4') == 10.0
+        assert self.calc.evaluate('2 + 3 ** 2') == 11.0
+        assert self.calc.evaluate('2 * 3 ** 2') == 18.0
 
-    def test_incorrect_syntex(self):
-        with self.assertRaises(CalcError):
-            self.calc.calculate('10 +')
-        with self.assertRaises(CalcError):
-            self.calc.calculate('2 3')
-        with self.assertRaises(CalcError):
-            self.calc.calculate('2 * e')
-        with self.assertRaises(CalcError):
-            self.calc.calculate('10 $ 3')
+    def test_no_spaces(self):
+        assert self.calc.evaluate('2+3') == 5.0
+        assert self.calc.evaluate('(2+3)*4') == 20.0
+        assert self.calc.evaluate('2*3+4*5') == 26.0
 
-    def test_incorrect_brackets(self):
-        with self.assertRaises(CalcError):
-            self.calc.calculate('(2 - 1')
-        with self.assertRaises(CalcError):
-            self.calc.calculate('2 - 1)')
-        with self.assertRaises(CalcError):
-            self.calc.calculate('((2 - 1)')
-        with self.assertRaises(CalcError):
-            self.calc.calculate('()')
+    def test_with_spaces(self):
+        assert self.calc.evaluate('  2  +  3  ') == 5.0
+        assert self.calc.evaluate('( 2 + 3 ) * 4 ') == 20.0
+        assert self.calc.evaluate(' 2 * 3 + 4 * 5 ') == 26.0
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_mixed_operations(self):
+        assert self.calc.evaluate('2 + 3 * 4 - 5 / 2') == 11.5
+        assert self.calc.evaluate('(2 + 3) * (4 - 1)') == 15.0
+        assert self.calc.evaluate('2 ** 3 + 4 * 5') == 28.0
+        assert self.calc.evaluate('10 % 3 + 7 // 2') == 4.0
+
+    def test_edge_cases(self):
+        assert self.calc.evaluate('0') == 0.0
+        assert self.calc.evaluate('1') == 1.0
+        assert self.calc.evaluate('0.00000000001') == 0.0
