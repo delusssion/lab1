@@ -1,5 +1,5 @@
-from tokenizer import Tokenizer
-from parser import Parser
+from .tokenizer import Tokenizer, CalcError
+from .parser import Parser
 
 
 class Calculator:
@@ -14,18 +14,18 @@ class Calculator:
             tokens = self.tokenizer.tokenize(expression)
             result = self.parser.parse_expression(tokens)
             if tokens:
-                raise ValueError('Некорректное выражение')
+                raise CalcError('Некорректное выражение')
             return round(result, 10)
-        except ValueError:
+        except CalcError:
             raise
         except ZeroDivisionError:
-            raise ValueError('Деление на ноль')
+            raise CalcError('Деление на ноль')
         except OverflowError:
-            raise ValueError('Слишком большое число')
+            raise CalcError('Слишком большое число')
         except RecursionError:
-            raise ValueError('Слишком сложное выражение')
+            raise CalcError('Слишком сложное выражение')
         except Exception as e:
-            raise ValueError(f'Непредвиденная ошибка: {str(e)}')
+            raise CalcError(f'Непредвиденная ошибка: {str(e)}')
 
 
 def main():

@@ -1,3 +1,6 @@
+from .tokenizer import CalcError
+
+
 class Parser:
     """Парсер и вычислитель выражений (рекурсивный спуск)"""
 
@@ -34,13 +37,13 @@ class Parser:
                 result /= right
             elif operator == '//':
                 if not self.is_integer(result) or not self.is_integer(right):
-                    raise ValueError('Целочисленное деление только для целых чисел')
+                    raise CalcError('Целочисленное деление только для целых чисел')
                 if right == 0:
                     raise ZeroDivisionError()
                 result //= right
             else:
                 if not self.is_integer(result) or not self.is_integer(right):
-                    raise ValueError('Операция % только для целых чисел')
+                    raise CalcError('Операция % только для целых чисел')
                 if right == 0:
                     raise ZeroDivisionError()
                 result %= right
@@ -55,7 +58,7 @@ class Parser:
             try:
                 result = result ** right
             except OverflowError:
-                raise ValueError('Результат слишком велик')
+                raise CalcError('Результат слишком велик')
         return result
 
     def parse_unary(self, tokens: list[str]) -> float:
@@ -70,15 +73,15 @@ class Parser:
         """Обработка чисел и скобок"""
         token = tokens.pop(0)
         if token == '(':
-            if tokens[0] == ')':
-                raise ValueError('Пустые скобки недопустимы')
+            if not tokens or tokens[0] == ')':
+                raise CalcError('Пустые скобки недопустимы')
             result = self.parse_expression(tokens)
             tokens.pop(0)
             return result
         try:
             return float(token)
         except ValueError:
-            raise ValueError('Некорректное число')
+            raise CalcError('Некорректное число')
 
     @staticmethod
     def is_integer(number: float) -> bool:
