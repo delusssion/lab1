@@ -1,20 +1,25 @@
 import re
 
 
+class CalcError(ValueError):
+    """Понятные ошибки калькулятора."""
+    pass
+
+
 class Tokenizer:
     """Разбивает выражение на токены и выполняет валидацию последовательности"""
 
     def tokenize(self, expr: str) -> list[str]:
         """Разбивает выражение на токены"""
         if not expr.strip():
-            raise ValueError('Пустое выражение')
+            raise CalcError('Пустое выражение')
         expr_no_spaces = expr.replace(' ', '')
 
         if re.search(r'\d\s+\d', expr):
-            raise ValueError('Пропущен оператор между числами')
+            raise CalcError('Пропущен оператор между числами')
 
         if expr_no_spaces[0] in '*/%':
-            raise ValueError('Выражение не может начинаться с оператора')
+            raise CalcError('Выражение не может начинаться с оператора')
 
         pattern = r'\d+\.?\d*|\.\d+|\*\*|//|[()*/%+\-]'
         tokens = []
@@ -23,7 +28,7 @@ class Tokenizer:
         while i < len(expr_no_spaces):
             match = re.match(pattern, expr_no_spaces[i:])
             if not match:
-                raise ValueError('Некорректный символ')
+                raise CalcError('Некорректный символ')
             token = match.group()
             i += len(token)
             tokens.append(token)
@@ -31,9 +36,9 @@ class Tokenizer:
         for token in tokens:
             if self.is_number(token):
                 if token.startswith('0') and len(token) > 1 and token[1] != '.':
-                    raise ValueError('Число не может начинаться с нуля')
+                    raise CalcError('Число не может начинаться с нуля')
                 if token.startswith('.') or token.endswith('.'):
-                    raise ValueError('Некорректный формат числа')
+                    raise CalcError('Некорректный формат числа')
 
         self.validate_token_sequence(tokens)
 
@@ -53,37 +58,37 @@ class Tokenizer:
             if curr == '(':
                 brackets_count += 1
                 if next_token == ')':
-                    raise ValueError('Пустые скобки недопустимы')
+                    raise CalcError('Пустые скобки недопустимы')
                 if next_token in binary_only:
-                    raise ValueError('После открывающей скобки не может быть оператора')
+                    raise CalcError('После открывающей скобки не может быть оператора')
 
             elif curr == ')':
                 brackets_count -= 1
                 if brackets_count < 0:
-                    raise ValueError('Неправильный порядок скобок')
+                    raise CalcError('Неправильный порядок скобок')
                 if next_token and self.is_number(next_token):
-                    raise ValueError('Пропущен оператор после закрывающей скобки')
+                    raise CalcError('Пропущен оператор после закрывающей скобки')
 
             elif curr in operators:
                 is_unary = (prev_token is None or prev_token == '(' or prev_token in operators)
                 if curr in binary_only:
                     if next_token in operators and next_token not in {'+', '-'}:
-                        raise ValueError('Недопустимая последовательность операторов')
+                        raise CalcError('Недопустимая последовательность операторов')
                     if next_token is None:
-                        raise ValueError('Ожидался операнд после оператора')
+                        raise CalcError('Ожидался операнд после оператора')
                 else:
                     if not is_unary:
                         j = i + 1
                         while j < len(tokens) and tokens[j] in {'+', '-'}:
                             j += 1
                         if j >= len(tokens):
-                            raise ValueError('Ожидался операнд после оператора')
+                            raise CalcError('Ожидался операнд после оператора')
                         if tokens[j] in operators and tokens[j] not in {'+', '-'}:
-                            raise ValueError('Недопустимая последовательность операторов')
+                            raise CalcError('Недопустимая последовательность операторов')
                         if next_token is None:
-                            raise ValueError('Ожидался операнд после оператора')
+                            raise CalcError('Ожидался операнд после оператора')
         if brackets_count != 0:
-            raise ValueError('Непарные скобки')
+            raise CalcError('Непарные скобки')
 
     @staticmethod
     def is_number(token: str) -> bool:
