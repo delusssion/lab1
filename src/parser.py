@@ -1,4 +1,4 @@
-from .tokenizer import CalcError
+from tokenizer import CalcError
 
 
 class Parser:

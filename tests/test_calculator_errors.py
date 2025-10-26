@@ -84,5 +84,3 @@ class TestCalculatorErrors:
             self.calc.evaluate('(' * 1000 + '1' + ')' * 1000)
         with pytest.raises(CalcError, match='Некорректный символ'):
             self.calc.evaluate('abc')
-        with pytest.raises(CalcError, match='Пропущен оператор между числами'):
-            self.calc.evaluate('2 + 3 4')

@@ -1,5 +1,5 @@
-from .tokenizer import Tokenizer, CalcError
-from .parser import Parser
+from tokenizer import Tokenizer, CalcError
+from parser import Parser
 
 
 class Calculator:
@@ -27,7 +27,6 @@ class Calculator:
         except Exception as e:
             raise CalcError(f'Непредвиденная ошибка: {str(e)}')
 
-
 def main():
     calculator = Calculator()
     print('Введите выражение:')
@@ -35,8 +34,12 @@ def main():
         expression = input()
         result = calculator.evaluate(expression)
         print(f'Результат: {result}')
+    except CalcError as e:
+        print(f'Ошибка: {e}')
     except KeyboardInterrupt:
         print('\nВычисление прервано')
+    except Exception as e:
+        print(f'Непредвиденная ошибка: {e}')
 
 
 if __name__ == '__main__':
