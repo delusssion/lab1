@@ -37,10 +37,6 @@ def main():
         print(f'Результат: {result}')
     except KeyboardInterrupt:
         print('\nВычисление прервано')
-    except ValueError as e:
-        print(f'Ошибка: {e}')
-    except Exception as e:
-        print(f'Непредвиденная ошибка: {e}')
 
 
 if __name__ == '__main__':
