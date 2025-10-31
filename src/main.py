@@ -13,8 +13,6 @@ class Calculator:
         try:
             tokens = self.tokenizer.tokenize(expression)
             result = self.parser.parse_expression(tokens)
-            if tokens:
-                raise CalcError('Некорректное выражение')
             return round(result, 10)
         except CalcError:
             raise
