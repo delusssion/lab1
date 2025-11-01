@@ -1,5 +1,5 @@
 class Parser:
-    """Парсер и вычислитель выражений (рекурсивный спуск) с полной проверкой структуры"""
+    """Парсер и вычислитель выражений (рекурсивный спуск)"""
 
     def parse_expression(self, tokens: list[str]) -> float:
         """Вход - список токенов"""
@@ -107,7 +107,7 @@ class Parser:
             raise ValueError('Некорректный токен')
 
     def _validate_number_format(self, token: str):
-        """Проверка формата числа (перенесено из токенизатора)"""
+        """Проверка формата числа"""
         if len(token) > 1 and token[0] == '0' and token[1] != '.':
             raise ValueError('Число не может начинаться с нуля')
         if token.startswith('.') or token.endswith('.'):

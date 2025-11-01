@@ -19,15 +19,15 @@ class Tokenizer:
             raise ValueError('Пропущен оператор')
 
         expr_no_spaces = expr.replace(' ', '')
-        tokens = self._extract_tokens(expr_no_spaces)
-        self._validate_basic_structure(tokens)
+        tokens = self.extract_tokens(expr_no_spaces)
+        self.validate_basic_structure(tokens)
         return tokens
 
-    def _extract_tokens(self, expr: str) -> list[str]:
+    def extract_tokens(self, expr: str) -> list[str]:
+        """Извлекает токены из строки"""
         tokens = []
         i = 0
         while i < len(expr):
-            # Проверка на ** и //
             if i < len(expr) - 1:
                 two_char = expr[i:i+2]
                 if two_char in {'**', '//'}:
@@ -39,8 +39,8 @@ class Tokenizer:
             if char in '()+-*/%':
                 tokens.append(char)
                 i += 1
-            elif char.isdigit() or char == '.':
-                match = re.match(r'\d+\.?\d*|\.\d+', expr[i:])
+            elif char.isdigit():
+                match = re.match(r'\d+\.?\d*', expr[i:])
                 if match:
                     tokens.append(match.group())
                     i += len(match.group())
@@ -50,7 +50,7 @@ class Tokenizer:
                 raise ValueError('Некорректный токен')
         return tokens
 
-    def _validate_basic_structure(self, tokens: list[str]):
+    def validate_basic_structure(self, tokens: list[str]):
         """Базовая проверка структуры выражений"""
         if not tokens:
             raise ValueError('Пустое выражение')
