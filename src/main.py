@@ -1,4 +1,4 @@
-from tokenizer import Tokenizer, CalcError
+from tokenizer import Tokenizer
 from parser import Parser
 
 
@@ -10,29 +10,39 @@ class Calculator:
         self.parser = Parser()
 
     def evaluate(self, expression: str) -> float:
+        """Вычисляет математическое выражение"""
         try:
             tokens = self.tokenizer.tokenize(expression)
-            result = self.parser.parse_expression(tokens)
+            result = self.parser.parse_expression(tokens.copy())
             return round(result, 10)
-        except CalcError:
-            raise
+        except ValueError as e:
+            # Ошибки токенизации или парсинга
+            raise ValueError(str(e))
         except ZeroDivisionError:
-            raise CalcError('Деление на ноль')
+            raise ZeroDivisionError('Деление на ноль')
         except OverflowError:
-            raise CalcError('Слишком большое число')
+            raise OverflowError('Слишком большое число')
         except RecursionError:
-            raise CalcError('Слишком сложное выражение')
+            raise RecursionError('Слишком сложное выражение')
         except Exception as e:
-            raise CalcError(f'Непредвиденная ошибка: {str(e)}')
+            raise ValueError(f'Ошибка вычисления: {str(e)}')
+
 
 def main():
     calculator = Calculator()
     print('Введите выражение:')
+
     try:
         expression = input()
         result = calculator.evaluate(expression)
         print(f'Результат: {result}')
-    except CalcError as e:
+    except ValueError as e:
+        print(f'Ошибка: {e}')
+    except ZeroDivisionError as e:
+        print(f'Ошибка: {e}')
+    except OverflowError as e:
+        print(f'Ошибка: {e}')
+    except RecursionError as e:
         print(f'Ошибка: {e}')
     except KeyboardInterrupt:
         print('\nВычисление прервано')

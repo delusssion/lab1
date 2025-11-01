@@ -1,98 +1,83 @@
 import re
 
-
-class CalcError(ValueError):
-    """Понятные ошибки калькулятора."""
-    pass
-
-
 class Tokenizer:
-    """Разбивает выражение на токены и выполняет валидацию последовательности"""
+    """Разделяет выражение на токены с базовой проверкой структуры"""
+
+    def __init__(self):
+        self.operators = {'+', '-', '*', '/', '//', '%', '**'}
+        self.binary_only = {'*', '/', '//', '%', '**'}
 
     def tokenize(self, expr: str) -> list[str]:
-        """Разбивает выражение на токены"""
         if not expr.strip():
-            raise CalcError('Пустое выражение')
-        expr_no_spaces = expr.replace(' ', '')
+            raise ValueError('Пустое выражение')
 
         if re.search(r'\d\s+\d', expr):
-            raise CalcError('Пропущен оператор между числами')
+            raise ValueError('Пропущен оператор')
+        if re.search(r'\d\s*\(', expr):
+            raise ValueError('Пропущен оператор')
+        if re.search(r'\)\s*\d', expr):
+            raise ValueError('Пропущен оператор')
 
-        if expr_no_spaces[0] in '*/%':
-            raise CalcError('Выражение не может начинаться с оператора')
-
-        pattern = r'\d+\.?\d*|\.\d+|\*\*|//|[()*/%+\-]'
-        tokens = []
-        i = 0
-
-        while i < len(expr_no_spaces):
-            match = re.match(pattern, expr_no_spaces[i:])
-            if not match:
-                raise CalcError('Некорректный символ')
-            token = match.group()
-            i += len(token)
-            tokens.append(token)
-
-        for token in tokens:
-            if self.is_number(token):
-                if token.startswith('0') and len(token) > 1 and token[1] != '.':
-                    raise CalcError('Число не может начинаться с нуля')
-                if token.startswith('.') or token.endswith('.'):
-                    raise CalcError('Некорректный формат числа')
-
-        self.validate_token_sequence(tokens)
-
+        expr_no_spaces = expr.replace(' ', '')
+        tokens = self._extract_tokens(expr_no_spaces)
+        self._validate_basic_structure(tokens)
         return tokens
 
-    def validate_token_sequence(self, tokens: list[str]) -> None:
-        """Проверяет корректность последовательности токенов"""
-        operators = {'+', '-', '*', '/', '//', '%', '**'}
-        binary_only = {'*', '/', '//', '%', '**'}
-        brackets_count = 0
+    def _extract_tokens(self, expr: str) -> list[str]:
+        tokens = []
+        i = 0
+        while i < len(expr):
+            # Проверка на ** и //
+            if i < len(expr) - 1:
+                two_char = expr[i:i+2]
+                if two_char in {'**', '//'}:
+                    tokens.append(two_char)
+                    i += 2
+                    continue
 
-        for i in range(len(tokens)):
-            curr = tokens[i]
-            next_token = tokens[i + 1] if i < len(tokens) - 1 else None
-            prev_token = tokens[i - 1] if i > 0 else None
-
-            if curr == '(':
-                brackets_count += 1
-                if next_token == ')':
-                    raise CalcError('Пустые скобки недопустимы')
-                if next_token in binary_only:
-                    raise CalcError('После открывающей скобки не может быть оператора')
-
-            elif curr == ')':
-                brackets_count -= 1
-                if brackets_count < 0:
-                    raise CalcError('Неправильный порядок скобок')
-                if next_token and self.is_number(next_token):
-                    raise CalcError('Пропущен оператор после закрывающей скобки')
-
-            elif curr in operators:
-                is_unary = (prev_token is None or prev_token == '(' or prev_token in operators)
-                if curr in binary_only:
-                    if next_token in operators and next_token not in {'+', '-'}:
-                        raise CalcError('Недопустимая последовательность операторов')
-                    if next_token is None:
-                        raise CalcError('Ожидался операнд после оператора')
+            char = expr[i]
+            if char in '()+-*/%':
+                tokens.append(char)
+                i += 1
+            elif char.isdigit() or char == '.':
+                match = re.match(r'\d+\.?\d*|\.\d+', expr[i:])
+                if match:
+                    tokens.append(match.group())
+                    i += len(match.group())
                 else:
-                    if not is_unary:
-                        j = i + 1
-                        while j < len(tokens) and tokens[j] in {'+', '-'}:
-                            j += 1
-                        if j >= len(tokens):
-                            raise CalcError('Ожидался операнд после оператора')
-                        if tokens[j] in operators and tokens[j] not in {'+', '-'}:
-                            raise CalcError('Недопустимая последовательность операторов')
-                        if next_token is None:
-                            raise CalcError('Ожидался операнд после оператора')
-        if brackets_count != 0:
-            raise CalcError('Непарные скобки')
+                    raise ValueError('Некорректный формат числа')
+            else:
+                raise ValueError('Некорректный токен')
+        return tokens
+
+    def _validate_basic_structure(self, tokens: list[str]):
+        """Базовая проверка структуры выражений"""
+        if not tokens:
+            raise ValueError('Пустое выражение')
+
+        brackets = 0
+        for token in tokens:
+            if token == '(':
+                brackets += 1
+            elif token == ')':
+                brackets -= 1
+                if brackets < 0:
+                    raise ValueError('Непарные скобки')
+
+        if brackets != 0:
+            raise ValueError('Непарные скобки')
+
+        if tokens[0] in self.binary_only:
+            raise ValueError('Оператор не может быть в начале выражения')
+        if tokens[-1] in self.operators:
+            raise ValueError('Ожидался операнд')
+
+        for i in range(len(tokens) - 1):
+            if tokens[i] == '(' and tokens[i + 1] in self.binary_only:
+                raise ValueError('После открывающей скобки не может быть оператора')
 
     @staticmethod
-    def is_number(token: str) -> bool:
-        """Проверяет, является ли токен числом"""
+    def _is_number(token: str) -> bool:
         try:
             float(token)
             return True

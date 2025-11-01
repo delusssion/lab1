@@ -17,3 +17,8 @@ per-file-ignores = { "tests/*.py" = ["F401"] }
 [tool.mypy]
 python_version = "3.12"
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+pythonpath = [
+    "src"
+]
