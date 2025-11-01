@@ -5,31 +5,31 @@ class Parser:
         """Вход - список токенов"""
         if not tokens:
             raise ValueError('Пустое выражение')
-        result = self._parse_addition(tokens)
+        result = self.parse_addition(tokens)
         return result
 
-    def _parse_addition(self, tokens: list[str]) -> float:
+    def parse_addition(self, tokens: list[str]) -> float:
         """Обработка сложения и вычитания"""
-        result = self._parse_multiplication(tokens)
+        result = self.parse_multiplication(tokens)
 
         while tokens and tokens[0] in {'+', '-'}:
             operator = tokens.pop(0)
             if not tokens:
                 raise ValueError('Ожидался операнд')
-            right = self._parse_multiplication(tokens)
+            right = self.parse_multiplication(tokens)
             result = result + right if operator == '+' else result - right
 
         return result
 
-    def _parse_multiplication(self, tokens: list[str]) -> float:
+    def parse_multiplication(self, tokens: list[str]) -> float:
         """Обработка умножения и деления"""
-        result = self._parse_power(tokens)
+        result = self.parse_power(tokens)
 
         while tokens and tokens[0] in {'*', '/', '//', '%'}:
             operator = tokens.pop(0)
             if not tokens:
                 raise ValueError('Ожидался операнд')
-            right = self._parse_power(tokens)
+            right = self.parse_power(tokens)
 
             if operator == '*':
                 result *= right
@@ -52,15 +52,15 @@ class Parser:
 
         return result
 
-    def _parse_power(self, tokens: list[str]) -> float:
+    def parse_power(self, tokens: list[str]) -> float:
         """Обработка возведения в степень (правоассоциативная)"""
-        result = self._parse_unary(tokens)
+        result = self.parse_unary(tokens)
 
         if tokens and tokens[0] == '**':
             tokens.pop(0)
             if not tokens:
                 raise ValueError('Ожидался операнд')
-            right = self._parse_power(tokens)
+            right = self.parse_power(tokens)
             try:
                 result = result ** right
             except OverflowError:
@@ -68,17 +68,17 @@ class Parser:
 
         return result
 
-    def _parse_unary(self, tokens: list[str]) -> float:
+    def parse_unary(self, tokens: list[str]) -> float:
         """Обработка унарных операторов"""
         sign = 1
         while tokens and tokens[0] in {'+', '-'}:
             if tokens.pop(0) == '-':
                 sign = -sign
 
-        result = self._parse_primary(tokens)
+        result = self.parse_primary(tokens)
         return sign * result
 
-    def _parse_primary(self, tokens: list[str]) -> float:
+    def parse_primary(self, tokens: list[str]) -> float:
         """Обработка чисел и скобок"""
         if not tokens:
             raise ValueError('Ожидался операнд')
@@ -91,13 +91,13 @@ class Parser:
             if tokens[0] == ')':
                 raise ValueError('Пустые скобки')
 
-            result = self._parse_addition(tokens)
+            result = self.parse_addition(tokens)
             if not tokens or tokens.pop(0) != ')':
                 raise ValueError('Непарные скобки')
             return result
 
         if self._is_number(token):
-            self._validate_number_format(token)
+            self.validate_number_format(token)
             if tokens and self._is_number(tokens[0]):
                 raise ValueError('Пропущен оператор')
 
@@ -106,7 +106,7 @@ class Parser:
         except ValueError:
             raise ValueError('Некорректный токен')
 
-    def _validate_number_format(self, token: str):
+    def validate_number_format(self, token: str):
         """Проверка формата числа"""
         if len(token) > 1 and token[0] == '0' and token[1] != '.':
             raise ValueError('Число не может начинаться с нуля')
