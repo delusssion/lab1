@@ -22,6 +22,7 @@ lab1/
 ├── .pre-commit-config.yaml
 ├── pyproject.toml
 ├── README.md
+├── FETCH_HEAD
 ├── requirements.txt
 └── uv.lock
 ```
@@ -94,12 +95,12 @@ python3 -m pytest -q
 
 1. Создать и активировать виртуальное окружение:
 ```
-python3 -m venv venv
-source venv/bin/activate # macOS/Linux
+python3 -m venv .venv
+source .venv/bin/activate # macOS/Linux
 ```
 ИЛИ
 ```
-venv\Scripts\activate #Windows
+.venv\Scripts\activate #Windows
 ```
 
 2. Установить зависимости:
