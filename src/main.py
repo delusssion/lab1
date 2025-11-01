@@ -16,7 +16,6 @@ class Calculator:
             result = self.parser.parse_expression(tokens.copy())
             return round(result, 10)
         except ValueError as e:
-            # Ошибки токенизации или парсинга
             raise ValueError(str(e))
         except ZeroDivisionError:
             raise ZeroDivisionError('Деление на ноль')
