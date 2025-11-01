@@ -22,6 +22,7 @@ lab1/
 ├── .pre-commit-config.yaml
 ├── pyproject.toml
 ├── README.md
+├── FETCH_HEAD
 ├── requirements.txt
 └── uv.lock
 ```
