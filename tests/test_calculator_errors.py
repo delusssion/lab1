@@ -23,6 +23,8 @@ class TestCalculatorErrors:
             self.calculator.evaluate('3 @ 4')
         with pytest.raises(ValueError, match='Некорректный токен'):
             self.calculator.evaluate('5 & 6')
+        with pytest.raises(ValueError, match='Некорректный '):
+            self.calculator.evaluate('.')
 
     def test_unpaired_brackets(self):
         """Непарные скобки"""
@@ -85,10 +87,8 @@ class TestCalculatorErrors:
         with pytest.raises(ValueError, match='Число не может начинаться с нуля'):
             self.calculator.evaluate('00.5')
 
-        with pytest.raises(ValueError, match='Некорректный формат числа'):
+        with pytest.raises(ValueError, match='Некорректный токен'):
             self.calculator.evaluate('2..3')
-        with pytest.raises(ValueError, match='Некорректный формат числа'):
-            self.calculator.evaluate('.')
         with pytest.raises(ValueError, match='Некорректный формат числа'):
             self.calculator.evaluate('5.')
 

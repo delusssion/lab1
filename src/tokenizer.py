@@ -40,7 +40,7 @@ class Tokenizer:
                 tokens.append(char)
                 i += 1
             elif char.isdigit():
-                match = re.match(r'\d+\.?\d*', expr[i:])
+                match = re.match(r'\d+\.?\d*|\.\d+', expr[i:])
                 if match:
                     tokens.append(match.group())
                     i += len(match.group())
